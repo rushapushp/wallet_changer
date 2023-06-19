@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState,  } from "react";
 import NavBar from "@/components/NavBar";
 import axios from "axios";
-import Link from "next/link";
+
 
 
 export default function Login() {
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [emailPasswordReset, setEmailPasswordReset] = useState("");
 
   const loginUser = () => {
     axios({
@@ -18,7 +19,24 @@ export default function Login() {
         password: loginPassword,
       },
       withCredentials: true,
-      url: "http://localhost:3001/login",
+      url: "http://localhost:3001/api/login",
+    })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const resetPassword = () => {
+    axios({
+      method: "post",
+      data: {
+        email: emailPasswordReset,
+      },
+      withCredentials: true,
+      url: "http://localhost:3001/api/forget-password",
     })
       .then((res) => {
         console.log(res);
@@ -52,6 +70,18 @@ export default function Login() {
       <button className="bg-green-500 p-2 rounded-full" onClick={loginUser}>
         войти
       </button>
+
+      {/* <input
+        className="bg-gray-200 rounded-full"
+        type="text"
+        name=" email"
+        placeholder=" email"
+        onChange={(e) => setEmailPasswordReset(e.target.value)}
+      ></input>
+
+      <button className="bg-orange-500 p-2 rounded-full" onClick={resetPassword}>
+        восстановить пароль
+      </button> */}
     </div>
   );
 }

@@ -1,7 +1,8 @@
-const db = require("./db");
+const db = require("../cfg/db");
 const bcrypt = require("bcrypt");
 const localStrategy = require("passport-local").Strategy;
 
+// Authentication middleware || связующий компонент аутентификации
 module.exports = function (passport) {
   passport.use(
     new localStrategy((username, password, done) => {
@@ -28,11 +29,12 @@ module.exports = function (passport) {
     })
   );
 
-  
+// User serializing || упорядочивание (складирование) пользователей
   passport.serializeUser((user, done) => {
     done(null, user.id);
   });
 
+// User deserializing || предоставление пользователей
   passport.deserializeUser((id, done) => {
     const getByIdQuery = "SELECT * FROM changer.account where id = ?";
     db.query(getByIdQuery, [id], (err, result) => {
@@ -42,6 +44,7 @@ module.exports = function (passport) {
       const userInfo = {
         id: result[0].id,
         username: result[0].username,
+        email: result[0].email,
       };
       done(null, userInfo);
     });
