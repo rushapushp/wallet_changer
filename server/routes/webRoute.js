@@ -9,7 +9,7 @@ user_route.use(express.static('public'));
 const userController = require('../controllers/userController')
 
 user_route.get('/mail-verification', userController.verifyMail);
-user_route.get('/reset_password', userController.resetPasswordLoad);
-user_route.post('/reset_password', userController.resetPassword);
+user_route.get('/reset-password', userController.resetPasswordLoad);
+user_route.post('/reset-password', userController.resetPassword);
 
 module.exports = user_route;

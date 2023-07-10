@@ -75,14 +75,16 @@ const login = (req, res, next) => {
       throw err;
     }
     if (!user) {
-      res.send("No user exists");
+      res.status(201);
+      res.send("Ваш логин или пароль не верны, попробуйте еще раз");
     }
     if (user) {
       req.login(user, (err) => {
         if (err) {
           throw err;
         }
-        res.send("User Logged in");
+        res.status(200);
+        res.send("Вы успешно вошли");
         console.log(user);
       });
     }
@@ -133,7 +135,7 @@ const forgetPassword = (req, res) => {
     email,
     function (error, result, fields) {
       if (error) {
-        return res.status(400).json({ message: error });
+        return res.status(400).json({ message:error });
       }
 
       if (result.length > 0) {
@@ -162,14 +164,10 @@ const forgetPassword = (req, res) => {
           )}, '${randomString}')`
         );
 
-        return res.status(200).send({
-          message: "password recovery email has been sent successfully",
-        });
+        return res.status(200).send("Письмо отправлено");
       }
 
-      return res.status(401).send({
-        message: "email doesn't exists",
-      });
+      return res.status(201).send("Аккаунт с этой почтой не найден");
     }
   );
 };
@@ -191,17 +189,18 @@ const resetPasswordLoad = (req, res) => {
 
         if (result !== undefined && result.length > 0) {
           db.query(
-            "SELECT * FROM account where email=? limit 1",
+            `SELECT * FROM account where email=? limit 1`,
             result[0].email,
             function (error, result, fields) {
               if (error) {
                 console.log(error);
               }
 
-              res.render("reset-password", { user: result[0] });
+              res.render('reset-password', { user: result[0] });
             }
           );
         } else {
+          res.render("404");
         }
       }
     );
