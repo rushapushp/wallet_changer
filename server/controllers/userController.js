@@ -95,10 +95,7 @@ const getUser = (req, res) => {
   res.send(req.user);
 };
 
-// КОСТЫЛЬ Get user email || получить почту пользователя
-const getUserEmail = (req, res) => {
-  res.send(req.user);
-};
+
 
 const verifyMail = (req, res) => {
   var token = req.query.token;
@@ -245,14 +242,32 @@ const verificationCheck = (req, res) =>{
   })
 }
 
+const setPersonalInformation = (req, res) => {
+  const first_name = req.body.first_name;
+  const second_name = req.body.first_name;
+  const socials = req.body.socials;
+  const email = req.body.email;
+  db.query(
+    "INSERT INTO personal_information (`email`, `first_name`, `second_name`, `socials`) VALUES (?,?,?,?)",
+    [email, first_name, second_name, socials],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      res.status(200);
+      res.send("Данные успешно обновлены");
+    }
+  );
+}
+
 module.exports = {
   register,
   login,
   getUser,
-  getUserEmail,
   verifyMail,
   forgetPassword,
   resetPasswordLoad,
   resetPassword,
-  verificationCheck
+  verificationCheck,
+  setPersonalInformation
 };

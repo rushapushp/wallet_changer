@@ -111,9 +111,4 @@ const ModalResetPassword = ({ onClose }) => {
 
 export default ModalResetPassword;
 
-{
-  /* <exitCross onClick={handleCloseClick}/>  
-   className="text-[#373C3D] rounded-full flex justify-center items-center
-         hover:rotate-90 transition-all duration-200"
-  */
-}
+
