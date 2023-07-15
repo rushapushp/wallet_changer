@@ -7,9 +7,11 @@ export default function Profile() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
 
-  const[firstName, setFirstName] = useState("")
-  const[secondName, setSecondName] = useState("")
-  const[socials, setSocials] = useState("")
+  const [firstName, setFirstName] = useState("");
+  const [secondName, setSecondName] = useState("");
+  const [socials, setSocials] = useState("");
+
+  const [verification, setVerification] = useState(false);
 
   useEffect(() => {
     getUser();
@@ -23,14 +25,17 @@ export default function Profile() {
     })
       .then((res) => {
         setUsername(res.data.username);
-        setEmail(res.data.email)
+        setEmail(res.data.email);
+        if (res.data.isVerified == 0) {
+          setVerification(false);
+        } else {
+          setVerification(true);
+        }
       })
       .catch((err) => {
         console.log(err);
       });
   };
-
-
 
   const setPersonalInformation = () => {
     axios({
@@ -54,12 +59,19 @@ export default function Profile() {
 
   return (
     <div>
-      <NavBar></NavBar>
+      
       <div className=" flex flex-col items-center gap-5">
-        <h1>Вы вошли как: {username}</h1>
+        <h1>Здравствуйте, {username}!</h1>
         <div className="flex flex-col items-center gap-5">
-          <h1>Ваша почта: {email} верифицирована!</h1>
           
+          {
+            (verification ? (
+              <h1 className="text-green-500 flex flex-row gap-1">Ваша почта <p className="text-black">{email}</p> подтверждена!</h1>
+            ) : (
+              <h1 className="text-red-500 flex flex-row gap-1">Ваша почта <p className="text-black">{email}</p> не подтверждена! Некоторые функции платформы ограничены.</h1>
+            ))
+          }
+
           <div className="flex flex-row gap-5">
             <div className="flex flex-col">
               <h1>Имя</h1>
@@ -68,7 +80,7 @@ export default function Profile() {
                 type="text"
                 name="username"
                 placeholder=" имя"
-                onChange={e => setFirstName(e.target.value)}
+                onChange={(e) => setFirstName(e.target.value)}
               ></input>
             </div>
             <div className="flex flex-col">
@@ -78,28 +90,39 @@ export default function Profile() {
                 type="text"
                 name="username"
                 placeholder=" фамилия"
-                onChange={e => setSecondName(e.target.value)}
+                onChange={(e) => setSecondName(e.target.value)}
               ></input>
             </div>
           </div>
           <div>
-
-          <h1>Соц. сеть для связи с вами</h1>
-          <input
-            className="bg-gray-200 rounded-[5px]"
-            type="text"
-            name="username"
-            placeholder=" ссылка"
-            onChange={e => setSocials(e.target.value)}
-          ></input>
+            <h1>Соц. сеть для связи с вами</h1>
+            <input
+              className="bg-gray-200 rounded-[5px]"
+              type="text"
+              name="username"
+              placeholder=" ссылка"
+              onChange={(e) => setSocials(e.target.value)}
+            ></input>
           </div>
-          <button className="bg-green-500 p-2 rounded-[5px]" onClick={setPersonalInformation}>
-        сохранить
-      </button>
+          <button
+            className="bg-green-500 p-2 rounded-[5px]"
+            onClick={setPersonalInformation}
+          >
+            сохранить
+          </button>
         </div>
       </div>
     </div>
   );
-};
-
-
+}
+  // /[а-яА-ЯёЁ\s\.\,\!\?\-]/gm
+  // const socialsHandler = (e) => {
+  //   setSocials(e.target.value)
+  //   const regexp = /[a-zA-Z]/gm
+  //   if (!regexp.test(String(e.target.value).toLowerCase())){
+  //     setSocialsError('не похоже на ссылку')
+  //   } else {
+  //     setSocialsError("")
+  //   }
+  // vpizdu nahui
+  // }

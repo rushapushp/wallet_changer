@@ -102,7 +102,7 @@ export default function Register() {
 
   return (
     <div className="flex flex-col justify-center items-center gap-5 ">
-      <NavBar></NavBar>
+      
       <h1>РЕГИСТРАЦИЯ</h1>
       {(wrongUsername && usernameError) && <div style={{color:'red', fontSize:"15px"}}>{usernameError}</div>}
       <input

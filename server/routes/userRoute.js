@@ -20,4 +20,5 @@ router.post("/forget-password", forgetPasswordValidation, userController.forgetP
 
 router.post("/set-personal-information", userController.setPersonalInformation)
 
+
 module.exports = router;

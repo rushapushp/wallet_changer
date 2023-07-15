@@ -1,3 +1,7 @@
+// ВАЖНО - ВСЕ ПЕРЕМЕННЫЕ ОБЪЯВЛЕННЫЕ В СКОПЕ ФУНКЦИИ, ОТВЕЧАЮЩИЕ ЗА ВВОДИМЫЕ ЮЗЕРОМ ДАННЫЕ, !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// А ТАКЖЕ ПЕРЕИСПОЛЬЗУЕМЫЕ ИЛИ ЗАНОВО ВВОДИМЫЕ В ДРУГИХ ПОЛЯХ НА КЛИЕНТЕ - ДОЛЖНЫ ОБЪЯВЛЯТЬСЯ КАК ПЕРЕМЕННЫЕ (var), !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// А НЕ КОНСТАНТОЙ (const), И КО ВСЕМУ ПРОЧЕМУ - SQL ЗАПРОСЫ, СТАТИЧЕСКИЕ ДАННЫЕ И Т.П., ПЕРЕИСПОЛЬЗУЕМЫЕ И НЕТ - ДОЛЖНЫЕ ОСТАВАТЬСЯ КОНСТАНТАМИ (const)!
+
 const { validationResult } = require("express-validator");
 const db = require("../cfg/db");
 const bycrypt = require("bcrypt");
@@ -8,11 +12,11 @@ const sendMail = require("../helpers/sendMail");
 
 // Registration + data validation + email sending || регистрация в системе + валидация ввода + отправка письма с подтверждением
 const register = (req, res) => {
-  const errors = validationResult(req);
-  const username = req.body.username;
-  const password = req.body.password;
-  const email = req.body.email;
-  const notVerifiedYet = "0";
+  var errors = validationResult(req);
+  var username = req.body.username;
+  var password = req.body.password;
+  var email = req.body.email;
+  var notVerifiedYet = "0";
 
   const insertUserQuery =
     "INSERT INTO account (`username`, `email`, `password`, `isVerified`) VALUES (?,?,?,?)";
@@ -95,8 +99,6 @@ const getUser = (req, res) => {
   res.send(req.user);
 };
 
-
-
 const verifyMail = (req, res) => {
   var token = req.query.token;
   const getByTokenQuery = "SELECT * FROM account where token=? limit 1";
@@ -120,7 +122,7 @@ const verifyMail = (req, res) => {
 };
 
 const forgetPassword = (req, res) => {
-  const errors = validationResult(req);
+  var errors = validationResult(req);
 
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -132,7 +134,7 @@ const forgetPassword = (req, res) => {
     email,
     function (error, result, fields) {
       if (error) {
-        return res.status(400).json({ message:error });
+        return res.status(400).json({ message: error });
       }
 
       if (result.length > 0) {
@@ -193,7 +195,7 @@ const resetPasswordLoad = (req, res) => {
                 console.log(error);
               }
 
-              res.render('reset-password', { user: result[0] });
+              res.render("reset-password", { user: result[0] });
             }
           );
         } else {
@@ -227,38 +229,63 @@ const resetPassword = (req, res) => {
   });
 };
 
-const verificationCheck = (req, res) =>{
-  var email = req.body.email;
-  db.query(`SELECT isVerified FROM account where email=?`, email, function(result) {
-    if(result === 0){
-      return res.status(200).send({
-        message: "this mail is not verified yet",
-      }); 
-    } else {
-      return res.status(201).send({
-        message: "this mail is verified",
-      }); 
-    }
-  })
-}
+
+// говнокод
+// const verificationCheck = (req, res) => {
+//   var email = req.body.email;
+//   db.query(
+//     `SELECT isVerified FROM account WHERE email=?`,
+//     email,
+//     function (err, result, fields) {
+//       if (result === 0) {
+//         return res
+//           .status(200)
+//           .send("Почта еще не подтверждена, некоторые функции ограничены");
+//       } else {
+//         return res.status(201).send("Почта подтверждена, вам доступны все функции");
+//       }
+//     }
+//   );
+// };
 
 const setPersonalInformation = (req, res) => {
-  const first_name = req.body.first_name;
-  const second_name = req.body.first_name;
-  const socials = req.body.socials;
-  const email = req.body.email;
+  var first_name = req.body.first_name;
+  var second_name = req.body.second_name;
+  var socials = req.body.socials;
+  var email = req.body.email;
+
   db.query(
-    "INSERT INTO personal_information (`email`, `first_name`, `second_name`, `socials`) VALUES (?,?,?,?)",
-    [email, first_name, second_name, socials],
-    (err, result) => {
-      if (err) {
-        console.log(err);
+    "SELECT * FROM personal_information where email=? limit 1",
+    email,
+    function (error, result, fields) {
+      if (result == 0) {
+        db.query(
+          "INSERT INTO personal_information (`email`, `first_name`, `second_name`, `socials`) VALUES (?,?,?,?)",
+          [email, first_name, second_name, socials],
+          (err, result) => {
+            if (err) {
+              console.log(err);
+            }
+            res.status(200);
+            res.send("Данные успешно добавлены");
+          }
+        );
+      } else {
+        db.query(
+          `UPDATE personal_information SET first_name='${first_name}', second_name='${second_name}', socials='${socials}' WHERE email='${email}'`,
+          [email, first_name, second_name, socials],
+          (err, result) => {
+            if (err) {
+              console.log(err);
+            }
+            res.status(201);
+            res.send("Данные успешно обновлены");
+          }
+        );
       }
-      res.status(200);
-      res.send("Данные успешно обновлены");
     }
   );
-}
+};
 
 module.exports = {
   register,
@@ -268,6 +295,7 @@ module.exports = {
   forgetPassword,
   resetPasswordLoad,
   resetPassword,
-  verificationCheck,
-  setPersonalInformation
+  setPersonalInformation,
 };
+
+

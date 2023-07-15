@@ -45,7 +45,7 @@ export default function Login() {
 
   return (
     <div className="flex flex-col justify-center items-center gap-5 ">
-      <NavBar></NavBar>
+      
 
       <h1>Вход</h1>
       <h1 className="text-red-500">{loginError}</h1>

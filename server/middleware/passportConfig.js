@@ -45,6 +45,7 @@ module.exports = function (passport) {
         id: result[0].id,
         username: result[0].username,
         email: result[0].email,
+        isVerified: result[0].isVerified,
       };
       done(null, userInfo);
     });
