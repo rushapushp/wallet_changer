@@ -46,6 +46,7 @@ module.exports = function (passport) {
         username: result[0].username,
         email: result[0].email,
         isVerified: result[0].isVerified,
+        avatarImage: result[0].avatar_image
       };
       done(null, userInfo);
     });

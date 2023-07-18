@@ -253,6 +253,7 @@ const setPersonalInformation = (req, res) => {
   var second_name = req.body.second_name;
   var socials = req.body.socials;
   var email = req.body.email;
+  // var filename = req.file.filename; // or originalname
 
   db.query(
     "SELECT * FROM personal_information where email=? limit 1",
@@ -260,7 +261,7 @@ const setPersonalInformation = (req, res) => {
     function (error, result, fields) {
       if (result == 0) {
         db.query(
-          "INSERT INTO personal_information (`email`, `first_name`, `second_name`, `socials`) VALUES (?,?,?,?)",
+          `INSERT INTO personal_information (email, first_name, second_name, socials) VALUES (?,?,?,?)`,
           [email, first_name, second_name, socials],
           (err, result) => {
             if (err) {
@@ -287,6 +288,44 @@ const setPersonalInformation = (req, res) => {
   );
 };
 
+const setAvatarImage = (req,res) =>{
+  var email = req.body.email;
+  var file = req.file.filename;
+  db.query(
+    "SELECT avatar_image FROM account where email=? limit 1",
+    email,
+    function (error, result, fields) {
+      if (result == 0) {
+        db.query(
+          `INSERT INTO account (avatar_image) VALUES (?)`,
+          [file],
+          (err, result) => {
+            if (err) {
+              console.log(err);
+            }
+            res.status(200);
+            res.send("Аватар успешно добавлен");
+          }
+        );
+      } else {
+        db.query(
+          `UPDATE account SET avatar_image='${file}' where email='${email}'`, 
+          (err, result) => {
+            if (err) {
+              console.log(err);
+            }
+            res.status(201);
+            res.send("Аватар успешно обновлен");
+          }
+        );
+      }
+    }
+  );
+  console.log(req.file)
+}
+
+
+
 module.exports = {
   register,
   login,
@@ -296,6 +335,9 @@ module.exports = {
   resetPasswordLoad,
   resetPassword,
   setPersonalInformation,
+  setAvatarImage,
+
+
 };
 
 
