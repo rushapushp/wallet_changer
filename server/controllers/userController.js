@@ -229,7 +229,6 @@ const resetPassword = (req, res) => {
   });
 };
 
-
 // говнокод
 // const verificationCheck = (req, res) => {
 //   var email = req.body.email;
@@ -288,7 +287,7 @@ const setPersonalInformation = (req, res) => {
   );
 };
 
-const setAvatarImage = (req,res) =>{
+const setAvatarImage = (req, res) => {
   var email = req.body.email;
   var file = req.file.filename;
   db.query(
@@ -309,7 +308,7 @@ const setAvatarImage = (req,res) =>{
         );
       } else {
         db.query(
-          `UPDATE account SET avatar_image='${file}' where email='${email}'`, 
+          `UPDATE account SET avatar_image='${file}' where email='${email}'`,
           (err, result) => {
             if (err) {
               console.log(err);
@@ -321,10 +320,26 @@ const setAvatarImage = (req,res) =>{
       }
     }
   );
-  console.log(req.file)
-}
+  console.log(req.file);
+};
 
-
+const getPersonalInformation = (req, res) => {
+  var email = req.params.id;
+  db.query(`SELECT * FROM personal_information where email='${email}'`, function (err, result) {
+    if (err) {
+      throw err;
+    }
+    const personalInfo = {
+      id: result[0].id,
+      email: result[0].email,
+      first_name: result[0].first_name,
+      second_name: result[0].second_name,
+      socials: result[0].socials,
+    };
+    res.send(personalInfo);
+    console.log(personalInfo)
+  });
+};
 
 module.exports = {
   register,
@@ -336,8 +351,5 @@ module.exports = {
   resetPassword,
   setPersonalInformation,
   setAvatarImage,
-
-
+  getPersonalInformation,
 };
-
-

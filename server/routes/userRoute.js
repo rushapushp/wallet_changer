@@ -56,6 +56,12 @@ router.post(
   userController.setAvatarImage
 );
 
+router.get(
+  "/get-personal-information/:id",
+  
+  userController.getPersonalInformation
+);
+
 
 
 
