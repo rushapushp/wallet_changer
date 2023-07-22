@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import ModalUploadNewAvatar from "@/components/ModalUploadNewAvatar";
+import ModalChangePassword from "@/components/ModalChangePassword";
 
 export default function Profile() {
   const [username, setUsername] = useState("");
@@ -13,27 +14,26 @@ export default function Profile() {
   const [socials, setSocials] = useState("");
   const [file, setFile] = useState();
   const [imgData, setImgData] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [FNinfo, setFNInfo] = useState("")
-  const [SNinfo, setSNInfo] = useState("")
-  const [Socinfo, setSocInfo] = useState("")
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [showPasswordChangeModal, setShowPasswordChangeModal] = useState(false);
+  const [FNinfo, setFNInfo] = useState("");
+  const [SNinfo, setSNInfo] = useState("");
+  const [Socinfo, setSocInfo] = useState("");
 
-
-  const handleUpload = (e) => {
-    const formdata = new FormData();
-    formdata.append("file", file);
-    formdata.append("email", email);
-    axios
-      .post("http://localhost:3001/api/set-avatar-image", formdata)
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err));
-  };
+  // const handleUpload = (e) => {
+  //   const formdata = new FormData();
+  //   formdata.append("file", file);
+  //   formdata.append("email", email);
+  //   axios
+  //     .post("http://localhost:3001/api/set-avatar-image", formdata)
+  //     .then((res) => console.log(res))
+  //     .catch((err) => console.log(err));
+  // };
 
   const [verification, setVerification] = useState(false);
 
   useEffect(() => {
     getUser();
-    
   }, []);
 
   const getUser = () => {
@@ -82,7 +82,7 @@ export default function Profile() {
     axios({
       method: "get",
       withCredentials: true,
-      url: `http://localhost:3001/api/get-personal-information/`+ email,
+      url: `http://localhost:3001/api/get-personal-information/` + email,
     })
       .then((res) => {
         setFNInfo(res.data.first_name);
@@ -94,20 +94,21 @@ export default function Profile() {
       });
   };
 
-
   return (
     <div className="mt-5 font-semibold">
       <div className=" flex flex-col items-center gap-5">
-
-
         <div className=" flex row items-center gap-5">
-          <button onClick={() => setShowModal(true)}>
-            <img className="rounded-2xl w-[120px] h-[120px] object-cover hover:opacity-50 duration-200" src={`http://localhost:3001/api/images/` + imgData} title="сменить аватарку" alt="avatar"/>
-            
+          <button onClick={() => setShowAvatarModal(true)}>
+            <img
+              className="rounded-2xl w-[120px] h-[120px] object-cover hover:opacity-50 duration-200"
+              src={`http://localhost:3001/api/images/` + imgData}
+              title="сменить аватарку"
+              alt="avatar"
+            />
           </button>
-          {showModal && (
+          {showAvatarModal && (
             <ModalUploadNewAvatar
-              onClose={() => setShowModal(false)}
+              onClose={() => setShowAvatarModal(false)}
             ></ModalUploadNewAvatar>
           )}
           <div className="flex flex-col">
@@ -130,7 +131,7 @@ export default function Profile() {
           <div className="flex flex-row gap-5">
             <div>
               <div className="flex flex-col ">
-                <h1>{FNinfo}</h1>
+                <h1>Имя: {FNinfo}</h1>
                 <input
                   className="bg-gray-200 rounded-[5px]"
                   type="text"
@@ -140,7 +141,7 @@ export default function Profile() {
                 ></input>
               </div>
               <div className="flex flex-col">
-                <h1>{SNinfo}</h1>
+                <h1>Фамилия: {SNinfo}</h1>
                 <input
                   className="bg-gray-200 rounded-[5px]"
                   type="text"
@@ -151,7 +152,7 @@ export default function Profile() {
               </div>
 
               <div>
-                <h1>{Socinfo}</h1>
+                <h1>Соц. сети: {Socinfo}</h1>
                 <input
                   className="bg-gray-200 rounded-[5px]"
                   type="text"
@@ -192,7 +193,7 @@ export default function Profile() {
               </div>
             </div>
           </div>
-          
+
           <button
             className="bg-green-500 p-2 rounded-[5px] ml-[370px]"
             onClick={setPersonalInformation}
@@ -206,6 +207,14 @@ export default function Profile() {
             utn
           </button> */}
         </div>
+        <button onClick={() => setShowPasswordChangeModal(true)} className="bg-green-500 p-2 rounded-[5px] ml-[370px]">
+            изменить пароль
+          </button>
+          {showPasswordChangeModal && (
+            <ModalChangePassword
+              onClose={() => setShowPasswordChangeModal(false)}
+            ></ModalChangePassword>
+          )}
       </div>
     </div>
   );

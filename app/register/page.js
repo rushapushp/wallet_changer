@@ -75,7 +75,7 @@ export default function Register() {
         break
     }
   } 
-  const registerUser = () => {
+  const registerUser =  () => {
     axios({
       method: "post",
       data: {

@@ -18,7 +18,7 @@ const ModalResetPassword = ({ onClose }) => {
     getUser();
   }, []);
 
-  const handleUpload = (e) => {
+  const handleUpload =  (e) => {
     const formdata = new FormData();
     formdata.append("file", file);
     formdata.append("email", email);
@@ -28,7 +28,7 @@ const ModalResetPassword = ({ onClose }) => {
       .catch((err) => console.log(err));
   };
 
-  const getUser = () => {
+  const getUser =  () => {
     axios({
       method: "get",
       withCredentials: true,

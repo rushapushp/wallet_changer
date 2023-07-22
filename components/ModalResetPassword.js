@@ -45,7 +45,7 @@ const ModalResetPassword = ({ onClose }) => {
     }
   } 
 
-  const resetPassword = () => {
+  const resetPassword =  () => {
     axios({
       method: "post",
       data: {

@@ -62,7 +62,9 @@ router.get(
   userController.getPersonalInformation
 );
 
+router.get("/change-password", userController.changePassword);
 
+// /:email/:old_password/:new_password
 
 
 module.exports = router;

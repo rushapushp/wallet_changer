@@ -109,7 +109,7 @@ const verifyMail = (req, res) => {
     }
     if (result.length > 0) {
       db.query(`
-        UPDATE account SET token = null, isVerified = 1 WHERE id = '${result[0].id}'
+      UPDATE account SET token = null, isVerified = 1 WHERE id = '${result[0].id}' 
         `);
       return res.render("mail-verification", {
         title: "Congratulations!",
@@ -325,20 +325,54 @@ const setAvatarImage = (req, res) => {
 
 const getPersonalInformation = (req, res) => {
   var email = req.params.id;
-  db.query(`SELECT * FROM personal_information where email='${email}'`, function (err, result) {
-    if (err) {
-      throw err;
+  db.query(
+    `SELECT * FROM personal_information where email='${email}'`,
+    function (err, result) {
+      if (result == 0) {
+        res.send("there is no personal information yet...");
+      } else {
+        const personalInfo = {
+          id: result[0].id,
+          email: result[0].email,
+          first_name: result[0].first_name,
+          second_name: result[0].second_name,
+          socials: result[0].socials,
+        };
+        res.send(personalInfo);
+        console.log(personalInfo);
+      }
     }
-    const personalInfo = {
-      id: result[0].id,
-      email: result[0].email,
-      first_name: result[0].first_name,
-      second_name: result[0].second_name,
-      socials: result[0].socials,
-    };
-    res.send(personalInfo);
-    console.log(personalInfo)
-  });
+  );
+};
+
+const changePassword = (req, res) => {
+  var email = req.query.email;
+  var old_password = req.query.old_password;
+  var new_password = req.query.new_password;
+  var HashedNewPassword = bycrypt.hashSync(new_password, 10);
+  db.query(
+    `SELECT password FROM account where email='${email}'`,
+    function (error, result) {
+      var oldPasswordFromDB = result[0].password;
+      bycrypt.compare(
+        old_password,
+        oldPasswordFromDB,
+        function (err, response) {
+          if (err) {
+            throw err;
+          }
+          if (!response) {
+            return res.status(201).send("Пароли не совпадают");
+          } else {
+            db.query(
+              `UPDATE account SET password='${HashedNewPassword}' where email='${email}'`
+            );
+            return res.status(200).send("Пароль успешно изменен");
+          }
+        }
+      );
+    }
+  );
 };
 
 module.exports = {
@@ -352,4 +386,5 @@ module.exports = {
   setPersonalInformation,
   setAvatarImage,
   getPersonalInformation,
+  changePassword,
 };

@@ -16,7 +16,7 @@ export default function Login() {
 
   
 
-  const loginUser = () => {
+  const loginUser =  () => {
     axios({
       method: "post",
       data: {
