@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import ModalUploadNewAvatar from "@/components/ModalUploadNewAvatar";
 import ModalChangePassword from "@/components/ModalChangePassword";
+import ModalChangeEmail from "@/components/ModalChangeEmail";
 
 export default function Profile() {
   const [username, setUsername] = useState("");
@@ -16,6 +17,7 @@ export default function Profile() {
   const [imgData, setImgData] = useState([]);
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [showPasswordChangeModal, setShowPasswordChangeModal] = useState(false);
+  const [showEmailChangeModal, setShowEmailChangeModal] = useState(false);
   const [FNinfo, setFNInfo] = useState("");
   const [SNinfo, setSNInfo] = useState("");
   const [Socinfo, setSocInfo] = useState("");
@@ -207,7 +209,16 @@ export default function Profile() {
             utn
           </button> */}
         </div>
-        <button onClick={() => setShowPasswordChangeModal(true)} className="bg-green-500 p-2 rounded-[5px] ml-[370px]">
+        <div className="flex flex-row gap-5 ">
+        <button onClick={() => setShowEmailChangeModal(true)} className="bg-green-500 p-2 rounded-[5px] ">
+            изменить имейл
+          </button>
+          {showEmailChangeModal && (
+            <ModalChangeEmail
+              onClose={() => setShowEmailChangeModal(false)}
+            ></ModalChangeEmail>
+          )}
+        <button onClick={() => setShowPasswordChangeModal(true)} className="bg-green-500 p-2 rounded-[5px] ">
             изменить пароль
           </button>
           {showPasswordChangeModal && (
@@ -215,6 +226,7 @@ export default function Profile() {
               onClose={() => setShowPasswordChangeModal(false)}
             ></ModalChangePassword>
           )}
+          </div>
       </div>
     </div>
   );

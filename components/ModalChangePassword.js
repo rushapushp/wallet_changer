@@ -18,25 +18,57 @@ const ModalChangePassword = ({ onClose }) => {
   const [changeError, setChangeError] = useState("");
 
   const [wrongEmail, setWrongEmail] = useState(false);
+  const [wrongOldPassword, setWrongOldPassword] = useState(false);
+  const [wrongNewPassword, setWrongNewPassword] = useState(false);
   const [emailError, setEmailError] = useState("Почта не должна быть пустой");
+  const [oldPasswordError, setOldPasswordError] = useState(
+    "Старый пароль не должен быть пустым"
+  );
+  const [newPasswordError, setNewPasswordError] = useState(
+    "Новый пароль не должен быть пустым"
+  );
   const [formValid, setFormValid] = useState(false);
 
   useEffect(() => {
-    if (emailError) {
+    if (oldPasswordError || newPasswordError || emailError) {
       setFormValid(false);
     } else {
       setFormValid(true);
     }
-  }, [emailError]);
+  }, [oldPasswordError, newPasswordError, emailError]);
 
-  const emailHandler = (e) => {
-    setEmailPasswordChange(e.target.value);
-    const re =
-      /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-    if (!re.test(String(e.target.value).toLowerCase())) {
-      setEmailError("Электронный почтовый адрес не корректен");
-    } else {
-      setEmailError("");
+  const dataHandler = (e) => {
+    if (e.target.name == "email") {
+      setEmailPasswordChange(e.target.value);
+      const re =
+        /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+      if (!re.test(String(e.target.value).toLowerCase())) {
+        setEmailError("Электронный почтовый адрес не корректен");
+      } else {
+        setEmailError("");
+      }
+    }
+    if (e.target.name == "old_password") {
+      setOldPassword(e.target.value);
+      if (e.target.value.length < 6) {
+        setOldPasswordError("Пароль должен содержать не менее 6 символов");
+        if (!e.target.value) {
+          setOldPasswordError("Пароль не должен быть пустым");
+        }
+      } else {
+        setOldPasswordError("");
+      }
+    }
+    if (e.target.name == "new_password") {
+      setNewPassword(e.target.value);
+      if (e.target.value.length < 6) {
+        setNewPasswordError("Пароль должен содержать не менее 6 символов");
+        if (!e.target.value) {
+          setNewPasswordError("Пароль не должен быть пустым");
+        }
+      } else {
+        setNewPasswordError("");
+      }
     }
   };
 
@@ -44,6 +76,12 @@ const ModalChangePassword = ({ onClose }) => {
     switch (e.target.name) {
       case "email":
         setWrongEmail(true);
+        break;
+      case "old_password":
+        setWrongOldPassword(true);
+        break;
+      case "new_password":
+        setWrongNewPassword(true);
         break;
     }
   };
@@ -70,6 +108,9 @@ const ModalChangePassword = ({ onClose }) => {
           setChangeNotification("");
           setChangeError(res.data);
         }
+        if (res.status == "202") {
+          setEmailError(res.data);
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -90,40 +131,52 @@ const ModalChangePassword = ({ onClose }) => {
       <div className="flex flex-col gap-5 justify-center items-center">
         <h1 className="text-[20px]">Введите вашу почту</h1>
 
-        <h1 className="text-green-500">{changeNotification}</h1>
         {wrongEmail && emailError && (
           <div style={{ color: "red", fontSize: "15px" }}>{emailError}</div>
         )}
         <input
           className="bg-gray-200 rounded-[5px]"
           type="text"
-          name=" email"
+          name="email"
           placeholder=" email"
-          onChange={(e) => emailHandler(e)}
+          onChange={(e) => dataHandler(e)}
           onBlur={(e) => blurHandler(e)}
         ></input>
-        <h1 className="text-red-500">{changeError}</h1>
-        <h1 className="text-red-500">{emailError}</h1>
+
         <h1 className="text-[20px]">Введите ваш старый пароль</h1>
+        {wrongOldPassword && oldPasswordError && (
+          <div style={{ color: "red", fontSize: "15px" }}>
+            {oldPasswordError}
+          </div>
+        )}
         <input
           className="bg-gray-200 rounded-[5px]"
           type="text"
-          name=" old password"
+          name="old_password"
           placeholder=" old password"
-          onChange={(e) => setOldPassword(e.target.value)}
+          onChange={(e) => dataHandler(e)}
+          onBlur={(e) => blurHandler(e)}
         ></input>
 
         <h1 className="text-[20px]">Введите ваш новый пароль</h1>
+        {wrongNewPassword && newPasswordError && (
+          <div style={{ color: "red", fontSize: "15px" }}>
+            {newPasswordError}
+          </div>
+        )}
         <input
           className="bg-gray-200 rounded-[5px]"
           type="text"
-          name=" new password"
+          name="new_password"
           placeholder=" new password"
-          onChange={(e) => setNewPassword(e.target.value)}
+          onChange={(e) => dataHandler(e)}
+          onBlur={(e) => blurHandler(e)}
         ></input>
+        <h1 className="text-red-500">{changeError}</h1>
 
+        <h1 className="text-green-500">{changeNotification}</h1>
         <button
-          className="bg-blue-300 p-2 rounded-[5px]"
+          className="bg-green-500 p-2 rounded-[5px] disabled:bg-green-200"
           onClick={changePassword}
           disabled={!formValid}
         >

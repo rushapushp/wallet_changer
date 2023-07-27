@@ -96,7 +96,7 @@ export default function Register() {
       })
       .catch((err) => {
         console.log(err);
-        setEmailError(res.data);
+        // setEmailError(res.data);
       });
   };
 
@@ -131,7 +131,7 @@ export default function Register() {
         onChange={e => passwordHandler(e)}
         onBlur={e => blurHandler(e)}
       ></input>
-      <button disabled={!formValid}  className="bg-green-500 p-2 rounded-full disabled:bg-green-300" onClick={registerUser}>
+      <button disabled={!formValid}  className="bg-green-500 p-2 rounded-full disabled:bg-green-200" onClick={registerUser}>
         зарегистрироваться
       </button>
       <h1 className="text-green-500">{registerNotification}</h1>

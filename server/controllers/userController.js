@@ -353,24 +353,119 @@ const changePassword = (req, res) => {
   db.query(
     `SELECT password FROM account where email='${email}'`,
     function (error, result) {
-      var oldPasswordFromDB = result[0].password;
-      bycrypt.compare(
-        old_password,
-        oldPasswordFromDB,
-        function (err, response) {
-          if (err) {
-            throw err;
+      if (result !== undefined && result.length > 0) {
+        var oldPasswordFromDB = result[0].password;
+        bycrypt.compare(
+          old_password,
+          oldPasswordFromDB,
+
+          function (error, response) {
+            if (!response) {
+              return res.status(201).send("Пароли не совпадают");
+            } else {
+              db.query(
+                `UPDATE account SET password='${HashedNewPassword}' where email='${email}'`
+              );
+              return res.status(200).send("Пароль успешно изменен");
+            }
           }
-          if (!response) {
-            return res.status(201).send("Пароли не совпадают");
-          } else {
-            db.query(
-              `UPDATE account SET password='${HashedNewPassword}' where email='${email}'`
-            );
-            return res.status(200).send("Пароль успешно изменен");
+        );
+      } else {
+        return res.status(202).send("Почта не найдена");
+      }
+    }
+  );
+};
+
+const changeEmail = (req, res) => {
+  var old_email = req.query.old_email;
+  var new_email = req.query.new_email;
+  db.query(
+    `SELECT * FROM account WHERE email='${new_email}'`,
+    function (error, result) {
+      if (error) {
+        throw error;
+      }
+      if (result.length > 0) {
+        return res.status(201).send("Ваша новая почта уже занята");
+      }
+      if (result.length === 0) {
+        db.query(
+          `SELECT * FROM account where email='${old_email}'`,
+          function (error, result) {
+            if (result.length === 0) {
+              return res.status(202).send("Ваша старая почта не найдена");
+            }
+            if (result.length > 0) {
+              let mailSubject = "Email change";
+              const emailToken = randomstring.generate();
+              var username = result[0].username;
+              let content =
+                "<p> Hello " +
+                username +
+                ', \
+        Please <a href="http://localhost:3001/change-email?email_token=' +
+                emailToken +
+                "&old_email=" +
+                old_email +
+                "&new_email=" +
+                new_email +
+                '"> Click this </a> to confirm that you really want to change your email to new one: ' +
+                new_email +
+                " </p>";
+              sendMail(old_email, mailSubject, content);
+
+              db.query(
+                "UPDATE account set email_token=? where email=?",
+                [emailToken, old_email],
+                function (error, result, fields) {
+                  if (error) {
+                    throw error;
+                  } else {
+                    return res
+                      .status(203)
+                      .send(
+                        "Письмо отправлено на старую почту"
+                      );
+                  }
+                }
+              );
+            }
           }
-        }
-      );
+        );
+      }
+    }
+  );
+};
+
+const confirmChangeEmail = (req, res) => {
+  var email_token = req.query.email_token;
+  var old_email = req.query.old_email;
+  var new_email = req.query.new_email;
+  
+
+  db.query(
+    `SELECT * FROM account where email_token=? limit 1`,
+    email_token,
+    function (error, result, fields) {
+      if (error) {
+        console.log(error.message);
+      }
+      if (result.length > 0) {
+        db.query(`
+      UPDATE account SET email_token = null, email='${new_email}' WHERE id = '${result[0].id}' 
+        `);
+        db.query(`
+        UPDATE personal_information SET email='${new_email}' WHERE email = '${old_email}' 
+          `);
+
+        return res.render("change-email", {
+          title: "Congratulations!",
+          message: "Your mail address has been successfully changed.",
+        });
+      } else {
+        return res.render("404");
+      }
     }
   );
 };
@@ -387,4 +482,6 @@ module.exports = {
   setAvatarImage,
   getPersonalInformation,
   changePassword,
+  changeEmail,
+  confirmChangeEmail,
 };
