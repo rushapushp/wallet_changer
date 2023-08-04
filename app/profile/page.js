@@ -21,17 +21,8 @@ export default function Profile() {
   const [FNinfo, setFNInfo] = useState("");
   const [SNinfo, setSNInfo] = useState("");
   const [Socinfo, setSocInfo] = useState("");
-
-  // const handleUpload = (e) => {
-  //   const formdata = new FormData();
-  //   formdata.append("file", file);
-  //   formdata.append("email", email);
-  //   axios
-  //     .post("http://localhost:3001/api/set-avatar-image", formdata)
-  //     .then((res) => console.log(res))
-  //     .catch((err) => console.log(err));
-  // };
-
+  const [pincodeInfo, setPincodeInfo] = useState("отправить пин-код");
+  const [pincodeSent, setPincodeSent] = useState(false);
   const [verification, setVerification] = useState(false);
 
   useEffect(() => {
@@ -90,6 +81,21 @@ export default function Profile() {
         setFNInfo(res.data.first_name);
         setSNInfo(res.data.second_name);
         setSocInfo(res.data.socials);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const sendPIN = async () => {
+    axios({
+      method: "get",
+      withCredentials: true,
+      url: `http://localhost:3001/api/send-pin?email=` + email,
+    })
+      .then((res) => {
+        setPincodeInfo(res.data);
+        setPincodeSent(true);
       })
       .catch((err) => {
         console.log(err);
@@ -210,7 +216,19 @@ export default function Profile() {
           </button> */}
         </div>
         <div className="flex flex-row gap-5 ">
-        <button onClick={() => setShowEmailChangeModal(true)} className="bg-green-500 p-2 rounded-[5px] ">
+          {pincodeSent?(
+          <button className="bg-green-200 p-2 rounded-[5px] ">
+          {pincodeInfo}
+        </button>
+          ) : (
+            <button onClick={sendPIN} className="bg-green-500 p-2 rounded-[5px] ">
+            {pincodeInfo}
+          </button>
+          )}
+          <button
+            onClick={() => setShowEmailChangeModal(true)}
+            className="bg-green-500 p-2 rounded-[5px] "
+          >
             изменить имейл
           </button>
           {showEmailChangeModal && (
@@ -218,7 +236,10 @@ export default function Profile() {
               onClose={() => setShowEmailChangeModal(false)}
             ></ModalChangeEmail>
           )}
-        <button onClick={() => setShowPasswordChangeModal(true)} className="bg-green-500 p-2 rounded-[5px] ">
+          <button
+            onClick={() => setShowPasswordChangeModal(true)}
+            className="bg-green-500 p-2 rounded-[5px] "
+          >
             изменить пароль
           </button>
           {showPasswordChangeModal && (
@@ -226,7 +247,7 @@ export default function Profile() {
               onClose={() => setShowPasswordChangeModal(false)}
             ></ModalChangePassword>
           )}
-          </div>
+        </div>
       </div>
     </div>
   );

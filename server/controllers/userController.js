@@ -9,6 +9,7 @@ const randomstring = require("randomstring");
 const passport = require("passport");
 require("dotenv").config;
 const sendMail = require("../helpers/sendMail");
+const gpc = require("generate-pincode");
 
 // Registration + data validation + email sending || регистрация в системе + валидация ввода + отправка письма с подтверждением
 const register = (req, res) => {
@@ -17,9 +18,10 @@ const register = (req, res) => {
   var password = req.body.password;
   var email = req.body.email;
   var notVerifiedYet = "0";
+  var pin = gpc(4);
 
   const insertUserQuery =
-    "INSERT INTO account (`username`, `email`, `password`, `isVerified`) VALUES (?,?,?,?)";
+    "INSERT INTO account (`username`, `email`, `password`, `isVerified`, `PIN`) VALUES (?,?,?,?,?)";
   const alreadyTakenCheckQuery = "SELECT * FROM account where email=?";
 
   if (!errors.isEmpty()) {
@@ -38,7 +40,7 @@ const register = (req, res) => {
       const hashedPassword = bycrypt.hashSync(password, 10);
       db.query(
         insertUserQuery,
-        [username, email, hashedPassword, notVerifiedYet],
+        [username, email, hashedPassword, notVerifiedYet, pin],
         (err, result) => {
           if (err) {
             console.log(err);
@@ -47,6 +49,7 @@ const register = (req, res) => {
           res.send("Учетная запись создана");
         }
       );
+
       let mailSubject = "Mail Verification";
       const randomToken = randomstring.generate();
       let content =
@@ -424,9 +427,7 @@ const changeEmail = (req, res) => {
                   } else {
                     return res
                       .status(203)
-                      .send(
-                        "Письмо отправлено на старую почту"
-                      );
+                      .send("Письмо отправлено на старую почту");
                   }
                 }
               );
@@ -442,7 +443,6 @@ const confirmChangeEmail = (req, res) => {
   var email_token = req.query.email_token;
   var old_email = req.query.old_email;
   var new_email = req.query.new_email;
-  
 
   db.query(
     `SELECT * FROM account where email_token=? limit 1`,
@@ -470,6 +470,32 @@ const confirmChangeEmail = (req, res) => {
   );
 };
 
+const sendPIN = (req, res) => {
+  var email = req.query.email;
+  db.query(
+    `SELECT * FROM account where email='${email}'`,
+    function (error, result) {
+      if (error) {
+        console.log(error.message);
+      }
+      if (result.length > 0) {
+        let mailSubject = "PIN-code";
+
+        let content =
+          "<p> Hello " +
+          result[0].username +
+          ", \
+       There is your PIN-code</p>" +
+          "<h1>" +
+          result[0].PIN +
+          "</h1>";
+        sendMail(req.query.email, mailSubject, content);
+        return res.status(200).send("Пин-код отправлен на почту");
+      }
+    }
+  );
+};
+
 module.exports = {
   register,
   login,
@@ -484,4 +510,5 @@ module.exports = {
   changePassword,
   changeEmail,
   confirmChangeEmail,
+  sendPIN,
 };

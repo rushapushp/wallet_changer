@@ -65,6 +65,8 @@ router.get(
 router.get("/change-password", userController.changePassword);
 
 router.get("/change-email", userController.changeEmail);
+
+router.get("/send-pin", userController.sendPIN);
 // /:email/:old_password/:new_password
 
 
