@@ -5,15 +5,11 @@ import axios from "axios";
 import ModalUploadNewAvatar from "@/components/ModalUploadNewAvatar";
 import ModalChangePassword from "@/components/ModalChangePassword";
 import ModalChangeEmail from "@/components/ModalChangeEmail";
+import { AiOutlineEdit } from "react-icons/ai";
 
 export default function Profile() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
-
-  const [firstName, setFirstName] = useState("");
-  const [secondName, setSecondName] = useState("");
-  const [socials, setSocials] = useState("");
-  const [file, setFile] = useState();
   const [imgData, setImgData] = useState([]);
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [showPasswordChangeModal, setShowPasswordChangeModal] = useState(false);
@@ -24,6 +20,10 @@ export default function Profile() {
   const [pincodeInfo, setPincodeInfo] = useState("отправить пин-код");
   const [pincodeSent, setPincodeSent] = useState(false);
   const [verification, setVerification] = useState(false);
+  const [firstnameEdit, setFirstnameEdit] = useState(false);
+  const [secondnameEdit, setSecondnameEdit] = useState(false);
+  const [socialsEdit, setSocialsEdit] = useState(false);
+  const [SPIResponse, setSPIResponse] = useState("");
 
   useEffect(() => {
     getUser();
@@ -56,15 +56,21 @@ export default function Profile() {
       method: "post",
       data: {
         email: email,
-        first_name: firstName,
-        second_name: secondName,
-        socials: socials,
+        first_name: FNinfo,
+        second_name: SNinfo,
+        socials: Socinfo,
       },
       withCredentials: true,
       url: "http://localhost:3001/api/set-personal-information",
     })
       .then((res) => {
         console.log(res);
+        if (res.status == "201") {
+          setSPIResponse(res.data);
+        }
+        if (res.status == "200") {
+          setSPIResponse(res.data);
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -104,8 +110,8 @@ export default function Profile() {
 
   return (
     <div className="mt-5 font-semibold">
-      <div className=" flex flex-col items-center gap-5">
-        <div className=" flex row items-center gap-5">
+      <div className=" flex flex-col items-center gap-5 ">
+        <div className=" flex row items-center gap-5 ">
           <button onClick={() => setShowAvatarModal(true)}>
             <img
               className="rounded-2xl w-[120px] h-[120px] object-cover hover:opacity-50 duration-200"
@@ -135,95 +141,103 @@ export default function Profile() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-5 p-5 rounded-2xl bg-slate-300">
-          <div className="flex flex-row gap-5">
-            <div>
-              <div className="flex flex-col ">
-                <h1>Имя: {FNinfo}</h1>
-                <input
-                  className="bg-gray-200 rounded-[5px]"
-                  type="text"
-                  name="username"
-                  placeholder=" имя"
-                  onChange={(e) => setFirstName(e.target.value)}
-                ></input>
+        <div className="flex flex-col items-center gap-5 p-5 rounded-2xl bg-slate-300 w-[400px] ">
+          <div className="flex flex-row gap-5  items-stretch">
+            <div className="flex flex-col  w-[300px] p-5">
+              <div className="flex flex-row justify-between ">
+                <h1>Имя: </h1>
+
+                {firstnameEdit ? (
+                  <input
+                    className="bg-gray-200 rounded-[5px]"
+                    type="text"
+                    name="username"
+                    placeholder=" имя"
+                    onChange={(e) => setFNInfo(e.target.value)}
+                  ></input>
+                ) : (
+                  <div className="flex flex-row gap-2">
+                    <h1> {FNinfo} </h1>
+                    <button
+                      onClick={() => setFirstnameEdit(true)}
+                      title="изменить имя"
+                    >
+                      <AiOutlineEdit className="hover:opacity-50 duration-50" />
+                    </button>
+                  </div>
+                )}
               </div>
-              <div className="flex flex-col">
-                <h1>Фамилия: {SNinfo}</h1>
-                <input
-                  className="bg-gray-200 rounded-[5px]"
-                  type="text"
-                  name="username"
-                  placeholder=" фамилия"
-                  onChange={(e) => setSecondName(e.target.value)}
-                ></input>
+              <div className="flex flex-row justify-between ">
+                <h1>Фамилия:</h1>
+
+                {secondnameEdit ? (
+                  <input
+                    className="bg-gray-200 rounded-[5px]"
+                    type="text"
+                    name="username"
+                    placeholder=" фамилия"
+                    onChange={(e) => setSNInfo(e.target.value)}
+                  ></input>
+                ) : (
+                  <div className="flex flex-row gap-2">
+                    <h1> {SNinfo} </h1>
+                    <button
+                      onClick={() => setSecondnameEdit(true)}
+                      title="изменить фамилию"
+                    >
+                      <AiOutlineEdit className="hover:opacity-50 duration-50" />
+                    </button>
+                  </div>
+                )}
               </div>
 
-              <div>
-                <h1>Соц. сети: {Socinfo}</h1>
-                <input
-                  className="bg-gray-200 rounded-[5px]"
-                  type="text"
-                  name="username"
-                  placeholder=" ссылка"
-                  onChange={(e) => setSocials(e.target.value)}
-                ></input>
-              </div>
-            </div>
-            <div>
-              <div className="flex flex-col ">
-                <h1>Кошелек 1</h1>
-                <input
-                  className="bg-gray-200 rounded-[5px]"
-                  type="text"
-                  name="username"
-                  placeholder=" Кошелек 1"
-                ></input>
-              </div>
-              <div className="flex flex-col">
-                <h1>Крипта 2</h1>
-                <input
-                  className="bg-gray-200 rounded-[5px]"
-                  type="text"
-                  name="username"
-                  placeholder=" Крипта 2"
-                ></input>
-              </div>
+              <div className="flex flex-row justify-between ">
+                <h1>Соц сети:</h1>
 
-              <div>
-                <h1>Кошелек 3</h1>
-                <input
-                  className="bg-gray-200 rounded-[5px]"
-                  type="text"
-                  name="username"
-                  placeholder=" Кошелек 3"
-                ></input>
+                {socialsEdit ? (
+                  <input
+                    className="bg-gray-200 rounded-[5px]"
+                    type="text"
+                    name="username"
+                    placeholder=" ссылка"
+                    onChange={(e) => setSocInfo(e.target.value)}
+                  ></input>
+                ) : (
+                  <div className="flex flex-row gap-2">
+                    <h1> {Socinfo} </h1>
+                    <button
+                      onClick={() => setSocialsEdit(true)}
+                      title="изменить ссылку на соц. сеть"
+                    >
+                      <AiOutlineEdit className="hover:opacity-50 duration-50" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
           <button
-            className="bg-green-500 p-2 rounded-[5px] ml-[370px]"
+            className="bg-green-500 p-2 rounded-[5px] "
             onClick={setPersonalInformation}
           >
             сохранить
           </button>
-          {/* <button
-            className="bg-green-500 p-2 rounded-[5px] ml-[370px]"
-            onClick={getPersonalInformation}
-          >
-            utn
-          </button> */}
+          
+          <h1 className="text-green-500">{SPIResponse}</h1>
         </div>
         <div className="flex flex-row gap-5 ">
-          {pincodeSent?(
-          <button className="bg-green-200 p-2 rounded-[5px] ">
-          {pincodeInfo}
-        </button>
+          {pincodeSent ? (
+            <button className="bg-green-200 p-2 rounded-[5px] ">
+              {pincodeInfo}
+            </button>
           ) : (
-            <button onClick={sendPIN} className="bg-green-500 p-2 rounded-[5px] ">
-            {pincodeInfo}
-          </button>
+            <button
+              onClick={sendPIN}
+              className="bg-green-500 p-2 rounded-[5px] "
+            >
+              {pincodeInfo}
+            </button>
           )}
           <button
             onClick={() => setShowEmailChangeModal(true)}
