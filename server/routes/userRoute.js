@@ -67,7 +67,10 @@ router.get("/change-password", userController.changePassword);
 router.get("/change-email", userController.changeEmail);
 
 router.get("/send-pin", userController.sendPIN);
-// /:email/:old_password/:new_password
+
+router.post("/add-wallet", userController.addWallet);
+
+router.get("/get-wallets", userController.getWallets);
 
 
 module.exports = router;

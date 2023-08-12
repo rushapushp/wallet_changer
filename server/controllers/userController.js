@@ -232,24 +232,6 @@ const resetPassword = (req, res) => {
   });
 };
 
-// говнокод
-// const verificationCheck = (req, res) => {
-//   var email = req.body.email;
-//   db.query(
-//     `SELECT isVerified FROM account WHERE email=?`,
-//     email,
-//     function (err, result, fields) {
-//       if (result === 0) {
-//         return res
-//           .status(200)
-//           .send("Почта еще не подтверждена, некоторые функции ограничены");
-//       } else {
-//         return res.status(201).send("Почта подтверждена, вам доступны все функции");
-//       }
-//     }
-//   );
-// };
-
 const setPersonalInformation = (req, res) => {
   var first_name = req.body.first_name;
   var second_name = req.body.second_name;
@@ -496,6 +478,82 @@ const sendPIN = (req, res) => {
   );
 };
 
+const addWallet = (req, res) => {
+  var wallet = req.body.wallet;
+  var address = req.body.address;
+  var email = req.body.email;
+
+  db.query(
+    "SELECT * FROM bills where email=? limit 1",
+    email,
+    function (error, result, fields) {
+      if (result == 0) {
+        db.query(
+          `INSERT INTO bills (email, ${wallet}) VALUES (?,?)`,
+          [email, address],
+          (err, result) => {
+            if (err) {
+              console.log(err);
+            }
+            res.status(200);
+            res.send("Данные успешно добавлены");
+          }
+        );
+      } else {
+        db.query(
+          `UPDATE bills SET ${wallet}='${address}' where email='${email}'`,
+          (err, result) => {
+            if (err) {
+              console.log(err);
+            }
+            res.status(201);
+            res.send("Данные успешно обновлены");
+          }
+        );
+      }
+    }
+  );
+};
+
+const getWallets = (req, res) => {
+  var email = req.query.email;
+
+  db.query(
+    `SELECT * FROM bills where email='${email}' limit 1`,
+    function (err, result) {
+      if (result.length > 0) {
+        // const walletsInfo = [
+        //   {id:1, Qiwi_USD: result[0].Qiwi_USD},
+        //   {id:2, YooMoney_USD: result[0].YooMoney_USD},
+        //   {id:3, Payeer_RUB: result[0].Payeer_RUB},
+        //   {id:4, PerfectMoney_RUB: result[0].PerfectMoney_RUB},
+        //   {id:5, WebMoney_RUB: result[0].WebMoney_RUB},
+        //   {id:6, PayPal_RUB: result[0].PayPal_RUB},
+        //   {id:7, Payeer_USD: result[0].Payeer_USD},
+        //   {id:8, PerfectMoney_USD: result[0].PerfectMoney_USD},
+        //   {id:9, WebMoney_USD: result[0].WebMoney_USD},
+        //   {id:10, PayPal_USD: result[0].PayPal_USD},
+        //   {id:11, Qiwi_RUB: result[0].Qiwi_RUB},
+        //   {id:12, YooMoney_RUB: result[0].YooMoney_RUB},
+        //   {id:13, Atomic_Wallet: result[0].Atomic_Wallet},
+        //   {id:14, Electrum: result[0].Electrum},
+        //   {id:15, DeFi_crypto_com: result[0].DeFi_crypto_com},
+        //   {id:16, Trust: result[0].Trust},
+        //   {id:17, MyEtherWallet: result[0].MyEtherWallet},
+        //   {id:18, Jaxx: result[0].Jaxx},
+        //   {id:19, Exodus: result[0].Exodus},
+        //   {id:20, Metamask: result[0].Metamask},
+        // ];
+        res.status(200).send(result[0]);
+        console.log(result[0]);
+      }
+      if (result.length === 0) {
+        return res.status(201).send("У вас пока нет привязанных кошелькоу :(");
+      }
+    }
+  );
+};
+
 module.exports = {
   register,
   login,
@@ -511,4 +569,6 @@ module.exports = {
   changeEmail,
   confirmChangeEmail,
   sendPIN,
+  addWallet,
+  getWallets
 };
