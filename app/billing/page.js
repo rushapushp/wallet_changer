@@ -5,6 +5,7 @@ import axios from "axios";
 import ModalAddWallet from "@/components/ModalAddWallet";
 import ModalAddCryptoWallet from "@/components/ModalAddCryptoWallet";
 
+
 export default function Profile() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -12,7 +13,7 @@ export default function Profile() {
   const [showAddWalletModal, setShowAddWalletModal] = useState(false);
   const [showAddCryptoWalletModal, setShowAddCryptoWalletModal] =
     useState(false);
-  const [walletsInfo, setWalletsInfo] = useState("");
+  const [walletsInfo, setWalletsInfo] = useState([]);
 
   useEffect(() => {
     getUser();
@@ -28,33 +29,34 @@ export default function Profile() {
         setImgData(res.data.avatarImage);
         setUsername(res.data.username);
         setEmail(res.data.email);
-        getWallets(res.data.email);
+        // getWallets(res.data.email);
+
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
-  const getWallets = async (email) => {
-    axios({
-      method: "get",
-      withCredentials: true,
-      url: `http://localhost:3001/api/get-wallets/?email=` + email,
-    })
-      .then((res) => {
-        if (res.status == "200") {
-          setWalletsInfo(res.data)
-        }
-        if (res.status == "201") {
-          setWalletsInfo(res.data)
-        }
-      })
-      // .then((res) => res.json())
-      // .then(data => setWalletsInfo(data))
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+  // const getWallets = async (email) => {
+  //   axios({
+  //     method: "get",
+  //     withCredentials: true,
+  //     url: `http://localhost:3001/api/get-wallets/?email=` + email,
+  //   })
+  //     .then((res) => {
+  //       if (res.status == "200") {
+  //         setWalletsInfo(res.data);
+  //       }
+  //       if (res.status == "201") {
+  //         setWalletsInfo(res.data);
+  //       }
+  //     })
+  //     // .then((res) => res.json())
+  //     // .then(data => setWalletsInfo(data))
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
 
   return (
     <div className="mt-5 font-semibold">
@@ -71,8 +73,6 @@ export default function Profile() {
             <h1 className="text-[20px]">{email}</h1>
           </div>
         </div>
-        
-        <h1>{walletsInfo.map((wallet) => {<h1>{wallet}</h1>})}</h1>
 
         <button
           onClick={() => setShowAddWalletModal(true)}
