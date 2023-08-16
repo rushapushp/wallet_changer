@@ -4,7 +4,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import ModalAddWallet from "@/components/ModalAddWallet";
 import ModalAddCryptoWallet from "@/components/ModalAddCryptoWallet";
-
+import moment from "moment";
+import "moment/locale/ru";
+moment.locale("ru");
 
 export default function Profile() {
   const [username, setUsername] = useState("");
@@ -13,10 +15,15 @@ export default function Profile() {
   const [showAddWalletModal, setShowAddWalletModal] = useState(false);
   const [showAddCryptoWalletModal, setShowAddCryptoWalletModal] =
     useState(false);
+  const [walletsEmpty, setWalletsEmpty] = useState("");
   const [walletsInfo, setWalletsInfo] = useState([]);
+  const [walletIcons, setWalletIcons] = useState([]);
 
   useEffect(() => {
     getUser();
+    getGateways();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getUser = async () => {
@@ -29,34 +36,47 @@ export default function Profile() {
         setImgData(res.data.avatarImage);
         setUsername(res.data.username);
         setEmail(res.data.email);
-        // getWallets(res.data.email);
-
+        // setUserId(res.data.id);
+        getWallets(res.data.id);
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
-  // const getWallets = async (email) => {
-  //   axios({
-  //     method: "get",
-  //     withCredentials: true,
-  //     url: `http://localhost:3001/api/get-wallets/?email=` + email,
-  //   })
-  //     .then((res) => {
-  //       if (res.status == "200") {
-  //         setWalletsInfo(res.data);
-  //       }
-  //       if (res.status == "201") {
-  //         setWalletsInfo(res.data);
-  //       }
-  //     })
-  //     // .then((res) => res.json())
-  //     // .then(data => setWalletsInfo(data))
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
+  const getWallets = async (userId) => {
+    axios({
+      method: "get",
+      withCredentials: true,
+      url: `http://localhost:3001/api/get-wallets/?userId=` + userId,
+    })
+      .then((res) => {
+        if (res.status == "201") {
+          setWalletsEmpty(res.data);
+        }
+        if (res.status == "200") {
+          setWalletsInfo(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const both = "both";
+  const getGateways = async () => {
+    axios({
+      method: "get",
+      withCredentials: true,
+      url: `http://localhost:3001/api/get-gateways/?isCrypto=` + both,
+    })
+      .then((res) => {
+        setWalletIcons(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   return (
     <div className="mt-5 font-semibold">
@@ -73,12 +93,40 @@ export default function Profile() {
             <h1 className="text-[20px]">{email}</h1>
           </div>
         </div>
-
+        <div className="flex flex-col w-[max] p-[25px] bg-slate-300 items-center rounded-2xl">
+          <div className="flex flex-row justify-between text-gray-500 w-[300px] text-[10px]">
+            <p>кошелек</p>
+            <p>номер</p>
+            <p>обновлен</p>
+          </div>
+          {walletsEmpty == "" ? (
+            walletsInfo.map((walletsInfo, index) => (
+              <div
+                key={index}
+                className="flex flex-row gap-3 w-[300px] hover:bg-slate-500 rounded-[5px] p-[5px] justify-between"
+              >
+                <Image
+                  src={walletIcons[walletsInfo.gateway_id - 1].image}
+                  height={24}
+                  width={24}
+                  alt="#"
+                />
+                <p>{walletsInfo.score}</p>
+                <p className="text-gray-500 ">
+                  {moment(walletsInfo.upd_at, "YYYYMMDD").fromNow()}
+                </p>
+              </div>
+            ))
+          ) : (
+            <h1 className="p-5">{walletsEmpty}</h1>
+          )}
+        </div>
+        <div className="flex flex-row gap-2">
         <button
           onClick={() => setShowAddWalletModal(true)}
           className="bg-green-500 p-2 rounded-[5px] "
         >
-          добавить интернет кошелек
+          + интернет кошелек
         </button>
         {showAddWalletModal && (
           <ModalAddWallet
@@ -89,13 +137,14 @@ export default function Profile() {
           onClick={() => setShowAddCryptoWalletModal(true)}
           className="bg-green-500 p-2 rounded-[5px] "
         >
-          добавить крыпто кошелек
+          + крыпто кошелек
         </button>
         {showAddCryptoWalletModal && (
           <ModalAddCryptoWallet
             onClose={() => setShowAddCryptoWalletModal(false)}
           ></ModalAddCryptoWallet>
         )}
+        </div>
       </div>
     </div>
   );

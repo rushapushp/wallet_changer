@@ -58,7 +58,7 @@ router.post(
 
 router.get(
   "/get-personal-information/:id",
-  
+
   userController.getPersonalInformation
 );
 
@@ -70,14 +70,8 @@ router.get("/send-pin", userController.sendPIN);
 
 router.get("/get-gateways", userController.getGateways);
 
-
-
-
-
-
 router.post("/add-wallet", userController.addWallet);
 
-// router.get("/get-wallets", userController.getWallets);
-
+router.get("/get-wallets", userController.getWallets);
 
 module.exports = router;

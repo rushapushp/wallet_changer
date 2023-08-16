@@ -9,7 +9,6 @@ import { ImCross } from "react-icons/im";
 import axios from "axios";
 import { AiOutlineDown } from "react-icons/ai";
 
-
 const ModalAddWallet = ({ onClose }) => {
   const handleCloseClick = (e) => {
     e.preventDefault();
@@ -30,23 +29,7 @@ const ModalAddWallet = ({ onClose }) => {
   const [walletAddress, setWalletAddress] = useState("");
   const [walletResponse, setWalletResponse] = useState("");
   const [email, setEmail] = useState("");
-  const [walletsData, setWalletsData] = useState([
-  ]);
-
-  // const walletsMockData = [
-  //   { id: 1, image: "/qiwi.png", name: "Qiwi_RUB" },
-  //   { id: 2, image: "/qiwi.png", name: "Qiwi_USD" },
-  //   { id: 3, image: "/youmoney.png", name: "YooMoney_RUB" },
-  //   { id: 4, image: "/youmoney.png", name: "YooMoney_USD" },
-  //   { id: 5, image: "/payeer.png", name: "Payeer_RUB" },
-  //   { id: 6, image: "/payeer.png", name: "Payeer_USD" },
-  //   { id: 7, image: "/webmoney.png", name: "WebMoney_RUB" },
-  //   { id: 8, image: "/webmoney.png", name: "WebMoney_USD" },
-  //   { id: 9, image: "/paypal.png", name: "PayPal_RUB" },
-  //   { id: 10, image: "/paypal.png", name: "PayPal_USD" },
-  //   { id: 11, image: "/perfectmoney.png", name: "PerfectMoney_RUB" },
-  //   { id: 12, image: "/perfectmoney.png", name: "PerfectMoney_USD" },
-  // ];
+  const [walletsData, setWalletsData] = useState([]);
 
   const getGateways = async () => {
     axios({
@@ -97,7 +80,7 @@ const ModalAddWallet = ({ onClose }) => {
     })
       .then((res) => {
         setEmail(res.data.email);
-        setUserId(res.data.id)
+        setUserId(res.data.id);
       })
       .catch((err) => {
         console.log(err);
@@ -173,3 +156,18 @@ const ModalAddWallet = ({ onClose }) => {
 };
 
 export default ModalAddWallet;
+
+// const walletsMockData = [
+//   { id: 1, image: "/qiwi.png", name: "Qiwi_RUB" },
+//   { id: 2, image: "/qiwi.png", name: "Qiwi_USD" },
+//   { id: 3, image: "/youmoney.png", name: "YooMoney_RUB" },
+//   { id: 4, image: "/youmoney.png", name: "YooMoney_USD" },
+//   { id: 5, image: "/payeer.png", name: "Payeer_RUB" },
+//   { id: 6, image: "/payeer.png", name: "Payeer_USD" },
+//   { id: 7, image: "/webmoney.png", name: "WebMoney_RUB" },
+//   { id: 8, image: "/webmoney.png", name: "WebMoney_USD" },
+//   { id: 9, image: "/paypal.png", name: "PayPal_RUB" },
+//   { id: 10, image: "/paypal.png", name: "PayPal_USD" },
+//   { id: 11, image: "/perfectmoney.png", name: "PerfectMoney_RUB" },
+//   { id: 12, image: "/perfectmoney.png", name: "PerfectMoney_USD" },
+// ];

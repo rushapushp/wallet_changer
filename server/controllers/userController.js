@@ -480,9 +480,22 @@ const sendPIN = (req, res) => {
 
 const getGateways = (req, res) => {
   var is_crypto = req.query.isCrypto;
-  db.query(
-    `SELECT id, name, image FROM gateways WHERE is_crypto='${is_crypto}'`,
-    function (err, result) {
+  if (is_crypto == 0 || is_crypto == 1) {
+    db.query(
+      `SELECT id, name, image FROM gateways WHERE is_crypto='${is_crypto}'`,
+      function (err, result) {
+        if (err) {
+          console.log(err.message);
+        }
+        if (result.length > 0) {
+          console.log(JSON.parse(JSON.stringify(result)));
+          return res.status(200).send(JSON.parse(JSON.stringify(result)));
+        }
+      }
+    );
+  };
+  if (is_crypto == 'both') {
+    db.query(`SELECT id, image FROM gateways`, function (err, result) {
       if (err) {
         console.log(err.message);
       }
@@ -490,8 +503,8 @@ const getGateways = (req, res) => {
         console.log(JSON.parse(JSON.stringify(result)));
         return res.status(200).send(JSON.parse(JSON.stringify(result)));
       }
-    }
-  );
+    });
+  }
 };
 
 const addWallet = (req, res) => {
@@ -500,7 +513,7 @@ const addWallet = (req, res) => {
   var userId = req.body.userId;
 
   db.query(
-    `SELECT * FROM scores WHERE user_id='${userId}'`,
+    `SELECT * FROM scores WHERE user_id='${userId}' AND gateway_id='${gatewayId}'`,
     function (error, result) {
       if (error) {
         console.log(error.message);
@@ -522,7 +535,7 @@ const addWallet = (req, res) => {
         db.query(
           `UPDATE scores SET user_id='${userId}', 
             gateway_id='${gatewayId}', 
-            score='${score}'`,
+            score='${score}' WHERE user_id='${userId}' AND gateway_id='${gatewayId}'`,
           function (error) {
             if (error) {
               console.log(error.message);
@@ -536,79 +549,24 @@ const addWallet = (req, res) => {
   );
 };
 
-// "SELECT * FROM bills where email=? limit 1",
-//   email,
-//   function (error, result, fields) {
-//     if (result == 0) {
-//       db.query(
-//         `INSERT INTO bills (email, ${wallet}) VALUES (?,?)`,
-//         [email, address],
-//         (err, result) => {
-//           if (err) {
-//             console.log(err);
-//           }
-//           res.status(200);
-//           res.send("Данные успешно добавлены");
-//         }
-//       );
-//     } else {
-//       db.query(
-//         `UPDATE bills SET ${wallet}='${address}' where email='${email}'`,
-//         (err, result) => {
-//           if (err) {
-//             console.log(err);
-//           }
-//           res.status(201);
-//           res.send("Данные успешно обновлены");
-//         }
-//       );
-//     }
-//   };
-// const getWallets = (req, res) => {
-//   var email = req.query.email;
-
-//   db.query(
-//     `SELECT * FROM bills where email='${email}' limit 1`,
-//     function (err, result) {
-//       if (result.length > 0) {
-//         const walletsInfo = [
-//           { id: 1, Qiwi_USD: result[0].Qiwi_USD },
-//           { id: 2, YooMoney_USD: result[0].YooMoney_USD },
-//           { id: 3, Payeer_RUB: result[0].Payeer_RUB },
-//           { id: 4, PerfectMoney_RUB: result[0].PerfectMoney_RUB },
-//           { id: 5, WebMoney_RUB: result[0].WebMoney_RUB },
-//           { id: 6, PayPal_RUB: result[0].PayPal_RUB },
-//           { id: 7, Payeer_USD: result[0].Payeer_USD },
-//           { id: 8, PerfectMoney_USD: result[0].PerfectMoney_USD },
-//           { id: 9, WebMoney_USD: result[0].WebMoney_USD },
-//           { id: 10, PayPal_USD: result[0].PayPal_USD },
-//           { id: 11, Qiwi_RUB: result[0].Qiwi_RUB },
-//           { id: 12, YooMoney_RUB: result[0].YooMoney_RUB },
-//           { id: 13, Atomic_Wallet: result[0].Atomic_Wallet },
-//           { id: 14, Electrum: result[0].Electrum },
-//           { id: 15, DeFi_crypto_com: result[0].DeFi_crypto_com },
-//           { id: 16, Trust: result[0].Trust },
-//           { id: 17, MyEtherWallet: result[0].MyEtherWallet },
-//           { id: 18, Jaxx: result[0].Jaxx },
-//           { id: 19, Exodus: result[0].Exodus },
-//           { id: 20, Metamask: result[0].Metamask },
-//         ];
-//         res.status(200).send(JSON.stringify(walletsInfo));
-//         var count = 0;
-//         for (i in result[0]) {
-//           count += 1;
-//           console.log(count, i);
-//         }
-
-//         // console.log(result[0]);
-//         console.log(JSON.stringify(walletsInfo));
-//       }
-//       if (result.length === 0) {
-//         return res.status(201).send("У вас пока нет привязанных кошелькоу :(");
-//       }
-//     }
-//   );
-// };
+const getWallets = (req, res) => {
+  var userId = req.query.userId;
+  db.query(
+    `SELECT id, gateway_id, score, upd_at FROM scores WHERE user_id='${userId}'`,
+    function (err, result) {
+      if (err) {
+        console.log(err.message);
+      }
+      if (result == 0) {
+        return res.status(201).send("Вы пока не добавили ни одного кошелька.");
+      }
+      if (result.length > 0) {
+        console.log(JSON.parse(JSON.stringify(result)));
+        return res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    }
+  );
+};
 
 module.exports = {
   register,
@@ -626,6 +584,6 @@ module.exports = {
   confirmChangeEmail,
   sendPIN,
   addWallet,
-  // getWallets,
+  getWallets,
   getGateways,
 };
