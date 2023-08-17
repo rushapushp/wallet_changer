@@ -27,6 +27,7 @@ export default function Profile() {
 
   useEffect(() => {
     getUser();
+  
   }, []);
 
   const getUser = () => {

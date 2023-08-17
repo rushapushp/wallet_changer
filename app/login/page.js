@@ -4,6 +4,7 @@ import { useState } from "react";
 import NavBar from "@/components/NavBar";
 import axios from "axios";
 import ModalResetPassword from "@/components/ModalResetPassword";
+import Link from "next/link";
 
 export default function Login() {
   const [loginUsername, setLoginUsername] = useState("");
@@ -14,9 +15,9 @@ export default function Login() {
 
   const [showModal, setShowModal] = useState(false);
 
-  
+  const [enter, setEnter] = useState(false);
 
-  const loginUser =  () => {
+  const loginUser = () => {
     axios({
       method: "post",
       data: {
@@ -31,6 +32,8 @@ export default function Login() {
         if (res.status == "200") {
           setLoginError("");
           setLoginNotification(res.data);
+          setEnter(true);
+          
         }
         if (res.status == "201") {
           setLoginNotification("");
@@ -45,8 +48,6 @@ export default function Login() {
 
   return (
     <div className="flex flex-col justify-center items-center gap-5 ">
-      
-
       <h1>Вход</h1>
       <h1 className="text-red-500">{loginError}</h1>
       <input
@@ -66,9 +67,15 @@ export default function Login() {
 
       <h1 className="text-green-500">{loginNotification}</h1>
 
-      <button className="bg-green-500 p-2 rounded-[5px]" onClick={loginUser}>
-        войти
-      </button>
+      {enter ? (
+        
+          <Link href="/profile" className="bg-green-500 p-2 rounded-[5px]">профиль</Link>
+        
+      ) : (
+        <button className="bg-green-500 p-2 rounded-[5px]" onClick={loginUser}>
+          войти
+        </button>
+      )}
 
       <div>
         <button

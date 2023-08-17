@@ -74,4 +74,6 @@ router.post("/add-wallet", userController.addWallet);
 
 router.get("/get-wallets", userController.getWallets);
 
+router.post("/send-tech-support-message", upload.single("file"), userController.sendTechSupportMessage);
+
 module.exports = router;

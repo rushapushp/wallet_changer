@@ -493,8 +493,8 @@ const getGateways = (req, res) => {
         }
       }
     );
-  };
-  if (is_crypto == 'both') {
+  }
+  if (is_crypto == "both") {
     db.query(`SELECT id, image FROM gateways`, function (err, result) {
       if (err) {
         console.log(err.message);
@@ -568,6 +568,52 @@ const getWallets = (req, res) => {
   );
 };
 
+const sendTechSupportMessage = (req, res) => {
+  var userId = req.body.userId;
+  var email = req.body.email;
+  var file = req.file.filename;
+  var text = req.body.text;
+  db.query(
+    `SELECT message_id FROM techsupport WHERE user_id='${userId}'`,
+    function (err, result) {
+      if (result == 0) {
+        if (file == "no_photo_added") {
+          db.query(
+            `INSERT INTO techsupport (user_id, user_email, text) VALUES(?,?,?)`,
+            [userId, email, text],
+            (error, result) => {
+              if (error) {
+                console.log(error.message);
+              } else {
+                res.status(200);
+                res.send("Ваше сообщение отправлено, ожидайте ответа на почте");
+              }
+            }
+          );
+        } else {
+          db.query(
+            `INSERT INTO techsupport (user_id, user_email, text, image) VALUES(?,?,?,?)`,
+            [userId, email, text, file],
+            (error, result) => {
+              if (error) {
+                console.log(error.message);
+              } else {
+                res.status(200);
+                res.send("Ваше сообщение отправлено, ожидайте ответа на почте");
+              }
+            }
+          );
+        }
+      } else {
+        res.status(201);
+        res.send(
+          "Вы не можете отправить новое сообщение пока не рассмотрено старое"
+        );
+      }
+    }
+  );
+};
+
 module.exports = {
   register,
   login,
@@ -586,4 +632,5 @@ module.exports = {
   addWallet,
   getWallets,
   getGateways,
+  sendTechSupportMessage,
 };
