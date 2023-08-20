@@ -5,7 +5,9 @@ import axios from "axios";
 import ModalUploadNewAvatar from "@/components/ModalUploadNewAvatar";
 import ModalChangePassword from "@/components/ModalChangePassword";
 import ModalChangeEmail from "@/components/ModalChangeEmail";
+
 import { AiOutlineEdit } from "react-icons/ai";
+import avatar from "../../public/avatar.jpg";
 
 export default function Profile() {
   const [username, setUsername] = useState("");
@@ -24,10 +26,10 @@ export default function Profile() {
   const [secondnameEdit, setSecondnameEdit] = useState(false);
   const [socialsEdit, setSocialsEdit] = useState(false);
   const [SPIResponse, setSPIResponse] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
 
   useEffect(() => {
     getUser();
-  
   }, []);
 
   const getUser = () => {
@@ -40,6 +42,7 @@ export default function Profile() {
         setImgData(res.data.avatarImage);
         setUsername(res.data.username);
         setEmail(res.data.email);
+        setAccountNumber(res.data.accountnumber);
         getPersonalInformation(res.data.email);
         if (res.data.isVerified == 0) {
           setVerification(false);
@@ -114,9 +117,15 @@ export default function Profile() {
       <div className=" flex flex-col items-center gap-5 ">
         <div className=" flex row items-center gap-5 ">
           <button onClick={() => setShowAvatarModal(true)}>
-            <img
-              className="rounded-2xl w-[120px] h-[120px] object-cover hover:opacity-50 duration-200"
-              src={`http://localhost:3001/api/images/` + imgData}
+            <Image
+              className="rounded-2xl shadow-2xl w-[120px] h-[120px] object-cover hover:opacity-50 duration-200"
+              src={
+                imgData == null
+                  ? avatar
+                  : `http://localhost:3001/api/images/` + imgData
+              }
+              width="600"
+              height="600"
               title="сменить аватарку"
               alt="avatar"
             />
@@ -128,7 +137,7 @@ export default function Profile() {
           )}
           <div className="flex flex-col">
             <h1 className="text-[30px]">{username}</h1>
-            <h1 className="text-[20px]">{email}</h1>
+            <h1 className="text-[15px] text-gray-500">id: {accountNumber}</h1>
             {verification ? (
               <h1 className="text-green-500 text-[10px] flex flex-row gap-1">
                 Ваша почта<p className="text-black">{email}</p>подтверждена!
@@ -142,9 +151,9 @@ export default function Profile() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-5 p-5 rounded-2xl bg-slate-300 w-[400px] ">
+        <div className="flex flex-col items-center gap-5 shadow-2xl p-2 rounded-2xl bg-slate-300 w-[400px] ">
           <div className="flex flex-row gap-5  items-stretch">
-            <div className="flex flex-col  w-[300px] p-5">
+            <div className="flex flex-col  w-[400px] p-2 gap-2">
               <div className="flex flex-row justify-between ">
                 <h1>Имя: </h1>
 
@@ -224,25 +233,25 @@ export default function Profile() {
           >
             сохранить
           </button>
-          
+
           <h1 className="text-green-500">{SPIResponse}</h1>
         </div>
         <div className="flex flex-row gap-5 ">
           {pincodeSent ? (
-            <button className="bg-green-200 p-2 rounded-[5px] ">
+            <button className="bg-green-200 p-2 rounded-[5px] shadow-2xl">
               {pincodeInfo}
             </button>
           ) : (
             <button
               onClick={sendPIN}
-              className="bg-green-500 p-2 rounded-[5px] "
+              className="bg-green-500 p-2 rounded-[5px]"
             >
               {pincodeInfo}
             </button>
           )}
           <button
             onClick={() => setShowEmailChangeModal(true)}
-            className="bg-green-500 p-2 rounded-[5px] "
+            className="bg-green-500 p-2 rounded-[5px] shadow-2xl"
           >
             изменить имейл
           </button>
@@ -253,7 +262,7 @@ export default function Profile() {
           )}
           <button
             onClick={() => setShowPasswordChangeModal(true)}
-            className="bg-green-500 p-2 rounded-[5px] "
+            className="bg-green-500 p-2 rounded-[5px] shadow-2xl"
           >
             изменить пароль
           </button>

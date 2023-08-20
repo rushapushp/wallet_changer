@@ -47,7 +47,15 @@ export default function NavBar() {
         </Link>
       </div>
       <div className="flex flex-row gap-7">
-        {isAdmin ? (
+        <Link href="/adminChat">
+          <BiSupport className="w-[30px] h-[30px] rounded-full hover:bg-slate-400 transition-all duration-50" />
+        </Link>
+
+        <Link href="/userChat">
+          <HiOutlineChat className="w-[30px] h-[30px] rounded-full hover:bg-slate-400 transition-all duration-50" />
+        </Link>
+
+        {/* {isAdmin ? (
           <Link href="/adminChat">
             <BiSupport className="w-[30px] h-[30px] rounded-full hover:bg-slate-400 transition-all duration-50" />
           </Link>
@@ -55,7 +63,7 @@ export default function NavBar() {
           <Link href="/userChat">
             <HiOutlineChat className="w-[30px] h-[30px] rounded-full hover:bg-slate-400 transition-all duration-50" />
           </Link>
-        )}
+        )} */}
 
         <div className="group-hover:visible group flex flex-row">
           <CgProfile className="w-[30px] h-[30px] rounded-full hover:bg-slate-400 transition-all duration-50 group" />

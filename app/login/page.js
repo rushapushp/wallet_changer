@@ -5,6 +5,9 @@ import NavBar from "@/components/NavBar";
 import axios from "axios";
 import ModalResetPassword from "@/components/ModalResetPassword";
 import Link from "next/link";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 export default function Login() {
   const [loginUsername, setLoginUsername] = useState("");
@@ -31,23 +34,28 @@ export default function Login() {
         console.log(res);
         if (res.status == "200") {
           setLoginError("");
-          setLoginNotification(res.data);
+          notifySuccess(res.data);
           setEnter(true);
           
         }
         if (res.status == "201") {
           setLoginNotification("");
-          setLoginError(res.data);
+          notifyError(res.data);
         }
       })
       .catch((err) => {
         console.log(err);
-        setLoginError(res.data);
+        notifyError(err.message);
       });
   };
 
+  const notifySuccess = (text) => toast.success(text);
+  const notifyError = (text) => toast.error(text);
+  const notifyInfo = (text) => toast.info(text);
+
   return (
     <div className="flex flex-col justify-center items-center gap-5 ">
+      <ToastContainer />
       <h1>Вход</h1>
       <h1 className="text-red-500">{loginError}</h1>
       <input
@@ -69,10 +77,10 @@ export default function Login() {
 
       {enter ? (
         
-          <Link href="/profile" className="bg-green-500 p-2 rounded-[5px]">профиль</Link>
+          <Link href="/profile" className="bg-green-500 p-2 rounded-[5px] ">профиль</Link>
         
       ) : (
-        <button className="bg-green-500 p-2 rounded-[5px]" onClick={loginUser}>
+        <button className="bg-green-500 p-2 rounded-[5px] " onClick={loginUser}>
           войти
         </button>
       )}

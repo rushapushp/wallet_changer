@@ -7,6 +7,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function UserChat() {
+  const defaultPhoto = "/noimg.png";
+
   useEffect(() => {
     getUser();
 
@@ -15,10 +17,10 @@ export default function UserChat() {
 
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
-  const [file, setFile] = useState();
+  const [file, setFile] = useState(defaultPhoto);
+
   const [defaultEmail, setDefaultEmail] = useState(true);
   const [userId, setUserId] = useState("");
-  const noPhoto = "no_photo_added";
 
   const getUser = async () => {
     axios({
@@ -35,13 +37,9 @@ export default function UserChat() {
       });
   };
 
-  const handleUpload = (e) => {
+  const handleUpload = () => {
     const formdata = new FormData();
-    if (file != undefined) {
-      formdata.append("file", file);
-    }else{
-      formdata.append("file", noPhoto);
-    }
+    formdata.append("file", file);
     formdata.append("email", email);
     formdata.append("text", subject);
     formdata.append("userId", userId);
@@ -53,6 +51,10 @@ export default function UserChat() {
           notifySuccess(res.data);
         }
         if (res.status == "201") {
+          //   setWalletResponse(res.data);
+          notifySuccess(res.data);
+        }
+        if (res.status == "202") {
           //   setWalletResponse(res.data);
           notifyError(res.data);
         }

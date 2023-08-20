@@ -72,8 +72,14 @@ router.get("/get-gateways", userController.getGateways);
 
 router.post("/add-wallet", userController.addWallet);
 
+router.post("/delete-wallet",  userController.deleteWallet);
+
 router.get("/get-wallets", userController.getWallets);
 
 router.post("/send-tech-support-message", upload.single("file"), userController.sendTechSupportMessage);
+
+router.get("/get-tech-support-message",  userController.getTechSupportMessages);
+
+router.post("/delete-tech-support-message",  userController.deleteTechSupportMessage);
 
 module.exports = router;

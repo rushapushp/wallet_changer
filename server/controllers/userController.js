@@ -19,9 +19,10 @@ const register = (req, res) => {
   var email = req.body.email;
   var notVerifiedYet = "0";
   var pin = gpc(4);
+  var accnum = gpc(8);
 
   const insertUserQuery =
-    "INSERT INTO account (`username`, `email`, `password`, `isVerified`, `PIN`) VALUES (?,?,?,?,?)";
+    "INSERT INTO account (`username`, `email`, `password`, `isVerified`, `PIN`, `accountnumber`) VALUES (?,?,?,?,?,?)";
   const alreadyTakenCheckQuery = "SELECT * FROM account where email=?";
 
   if (!errors.isEmpty()) {
@@ -40,7 +41,7 @@ const register = (req, res) => {
       const hashedPassword = bycrypt.hashSync(password, 10);
       db.query(
         insertUserQuery,
-        [username, email, hashedPassword, notVerifiedYet, pin],
+        [username, email, hashedPassword, notVerifiedYet, pin, accnum],
         (err, result) => {
           if (err) {
             console.log(err);
@@ -549,6 +550,21 @@ const addWallet = (req, res) => {
   );
 };
 
+const deleteWallet = (req, res) => {
+  var walletId = req.body.walletId;
+  db.query(
+    `DELETE FROM scores WHERE id='${walletId}'`,
+    (error, result) => {
+      if (error) {
+        console.log(error.message);
+      } else {
+        res.status(201);
+        res.send("Удалено");
+      }
+    }
+  );
+};
+
 const getWallets = (req, res) => {
   var userId = req.query.userId;
   db.query(
@@ -573,42 +589,58 @@ const sendTechSupportMessage = (req, res) => {
   var email = req.body.email;
   var file = req.file.filename;
   var text = req.body.text;
+
   db.query(
     `SELECT message_id FROM techsupport WHERE user_id='${userId}'`,
     function (err, result) {
       if (result == 0) {
-        if (file == "no_photo_added") {
-          db.query(
-            `INSERT INTO techsupport (user_id, user_email, text) VALUES(?,?,?)`,
-            [userId, email, text],
-            (error, result) => {
-              if (error) {
-                console.log(error.message);
-              } else {
-                res.status(200);
-                res.send("Ваше сообщение отправлено, ожидайте ответа на почте");
-              }
+        db.query(
+          `INSERT INTO techsupport (user_id, user_email, text, image) VALUES(?,?,?,?)`,
+          [userId, email, text, file],
+          (error, result) => {
+            if (error) {
+              console.log(error.message);
+            } else {
+              res.status(201);
+              res.send("Ваше сообщение отправлено, ожидайте ответа на почте");
             }
-          );
-        } else {
-          db.query(
-            `INSERT INTO techsupport (user_id, user_email, text, image) VALUES(?,?,?,?)`,
-            [userId, email, text, file],
-            (error, result) => {
-              if (error) {
-                console.log(error.message);
-              } else {
-                res.status(200);
-                res.send("Ваше сообщение отправлено, ожидайте ответа на почте");
-              }
-            }
-          );
-        }
+          }
+        );
       } else {
-        res.status(201);
+        res.status(202);
         res.send(
           "Вы не можете отправить новое сообщение пока не рассмотрено старое"
         );
+      }
+    }
+  );
+};
+
+const getTechSupportMessages = (req, res) => {
+  db.query(`SELECT * FROM techsupport`, function (err, result) {
+    if (err) {
+      console.log(err.message);
+    }
+    if (result == 0) {
+      return res.status(201).send("Нет отправленных сообщений.");
+    }
+    if (result.length > 0) {
+      console.log(JSON.parse(JSON.stringify(result)));
+      return res.status(200).send(JSON.parse(JSON.stringify(result)));
+    }
+  });
+};
+
+const deleteTechSupportMessage = (req, res) => {
+  var messageId = req.body.messageId;
+  db.query(
+    `DELETE FROM techsupport WHERE message_id='${messageId}'`,
+    (error, result) => {
+      if (error) {
+        console.log(error.message);
+      } else {
+        res.status(201);
+        res.send("Удалено");
       }
     }
   );
@@ -633,4 +665,7 @@ module.exports = {
   getWallets,
   getGateways,
   sendTechSupportMessage,
+  getTechSupportMessages,
+  deleteTechSupportMessage,
+  deleteWallet
 };
